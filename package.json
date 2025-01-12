@@ -1,0 +1,17 @@
+{
+  "name": "terminal",
+  "version": "1.0.0",
+  "description": "Test app to interpret basic commands as input on the REPL",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "terminal",
+    "interpreter",
+    "test",
+    "shell"
+  ],
+  "author": "Sourav Dey",
+  "license": "ISC"
+}
