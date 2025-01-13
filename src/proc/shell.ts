@@ -5,7 +5,7 @@ export type ShellID = number;
 /**
  * Main command interpreter. Can have a single parent and a single child.
  */
-export default class Shell {
+export class Shell {
   protected static DEFAULT_PROMPT_STRING = '>> ';
 
   private id:             ShellID;

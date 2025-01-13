@@ -1,6 +1,6 @@
 export type EnvironmentVariable = {[key: string]: string|number|undefined};
 
-export default class Environment {
+export class Environment {
   static DEBUG_ENABLED: boolean = false;
   static INIT_DIRECTORY: string;
   static EXTRAS: EnvironmentVariable = {};
