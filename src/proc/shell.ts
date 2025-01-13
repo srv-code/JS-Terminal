@@ -1,6 +1,15 @@
 import { formatDateTime } from "../util/date";
+import readline from "readline-sync";
+
 
 export type ShellID = number;
+
+export interface ShellAttributes {
+  id:             ShellID;
+  startTime:      Date;
+  parentId:       ShellID|null;
+  childId:        ShellID|null;
+}
 
 /**
  * Main command interpreter. Can have a single parent and a single child.
@@ -19,14 +28,13 @@ export class Shell {
     return _id;
   }
 
-  protected getAttributes(): Object {
-    const attr: any = {};
-    attr.id = this.id;
-    attr.startTime = this.startTime;
-    attr.parentId = this.parentId;
-    attr.childId = this.childId;
-    
-    return attr;
+  protected getAttributes(): ShellAttributes {
+    return {
+      id: this.id,
+      startTime: this.startTime,
+      parentId: this.parentId,
+      childId: this.childId,
+    }
   }
 
   protected static printBornMessage(shell: Shell) {
@@ -36,8 +44,8 @@ export class Shell {
   }
 
   protected static printKillMessage(shell: Shell) {
-    console.log('*****');
-    console.log(`Shell (${shell.id}) exiting...\n`);
+    console.log('\n*****');
+    console.log(`Shell (${shell.id}) exiting...`);
     if(shell.parentId) {
       console.log(`Returning to parent shell ${shell.id}`);
     } else {
@@ -50,15 +58,18 @@ export class Shell {
     let command: string       = '';
     let shouldExit: boolean   = false;
 
-    while(!shouldExit) {
+    do {
+      command = readline.question(`\n${shell.promptString}`)
       switch(command) {
-        case '': console.log(`\n${shell.promptString}`); break;
+        case 'exit': shouldExit = true; break;
+        case 'hi': console.log('hi'); break;
         default:
           // if(ShellGlobal.env.DEBUG_ENABLED)  {
-          //   console.assert(true, '[***DEFAULT CASE OF SHELL REPL***]');
+            console.assert(true, '[***DEFAULT CASE OF SHELL REPL***]');
           // }
       }
-    }
+    } while(!shouldExit);
+    shell.killChild();
   }
 
   constructor(parentId?: ShellID) {
@@ -66,10 +77,10 @@ export class Shell {
     this.startTime = new Date();
     this.parentId = parentId ?? null;
     this.childId = null;
-    console.log('>> bef');
+    // console.log('>> bef');
     
     Shell.printBornMessage(this);
-    // Shell.initREPL(this);
+    Shell.initREPL(this);
   }
 
   spawnChild(): Shell {
