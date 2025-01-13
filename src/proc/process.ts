@@ -3,7 +3,7 @@ import events, { EventEmitter } from 'events';
 /**
  * Main Terminal Process class
  */
-export class TerminalProcess {
+export class Process {
   private eventEmitter: EventEmitter;
   private startTime: Date;
   // private environment: Environment;

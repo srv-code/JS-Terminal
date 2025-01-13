@@ -1,3 +1,3 @@
-import { TerminalProcess } from './src/proc/index';
+import { Process as TerminalProcess } from './src/proc/index';
 
 new TerminalProcess();
