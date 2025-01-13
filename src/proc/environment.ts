@@ -6,13 +6,13 @@ export class Environment {
   static EXTRAS: EnvironmentVariable = {};
 
   init(vars: EnvironmentVariable) {
-    for(const [key, val] of Object.entries(vars)) {
-      switch (key) {
-        case '-d': Environment.DEBUG_ENABLED = true; break;
-        case 'cwd': Environment.INIT_DIRECTORY = val; break;
-        // default: Environment.EXTRAS.push(v); break;
-      }
-    }
+    // for(const [key, val] of Object.entries(vars)) {
+    //   switch (key) {
+    //     case '-d': Environment.DEBUG_ENABLED = true; break;
+    //     case 'cwd': Environment.INIT_DIRECTORY = val; break;
+    //     // default: Environment.EXTRAS.push(v); break;
+    //   }
+    // }
 
     Environment.checkForEmptyValues()
   }

@@ -50,9 +50,9 @@ ${shell.parentId ? `Returning to parent shell ${shell.id}` : '\nThis was the top
       switch(command) {
         case '': console.log(`\n${shell.promptString}`); break;
         default:
-          if(ShellGlobal.env.DEBUG_ENABLED)  {
-            console.assert(true, '[***DEFAULT CASE OF SHELL REPL***]');
-          }
+          // if(ShellGlobal.env.DEBUG_ENABLED)  {
+          //   console.assert(true, '[***DEFAULT CASE OF SHELL REPL***]');
+          // }
       }
     }
   }
