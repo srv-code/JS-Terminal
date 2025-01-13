@@ -30,17 +30,21 @@ export class Shell {
   }
 
   protected static printBornMessage(shell: Shell) {
-    console.log(`*****
-Shell (${shell.id}) started on ${formatDateTime(shell.startTime)}${shell.parentId ? '' : '\nThis is the top-most shell'}
-*****`);
+    console.log('*****');
+    console.log(`Shell (${shell.id}) started on ${formatDateTime(shell.startTime)}${shell.parentId ? '' : '\nThis is the top-most shell'}`);
+    console.log('*****');
   }
 
   protected static printKillMessage(shell: Shell) {
-    console.log(`*****
-Shell (${shell.id}) exiting...
-${shell.parentId ? `Returning to parent shell ${shell.id}` : '\nThis was the top-most shell'}
-*****`);
+    console.log('*****');
+    console.log(`Shell (${shell.id}) exiting...\n`);
+    if(shell.parentId) {
+      console.log(`Returning to parent shell ${shell.id}`);
+    } else {
+      console.log('This was the top-most shell');
     }
+    console.log('*****');
+  }
     
   protected static initREPL(shell: Shell) {
     let command: string       = '';
@@ -62,9 +66,10 @@ ${shell.parentId ? `Returning to parent shell ${shell.id}` : '\nThis was the top
     this.startTime = new Date();
     this.parentId = parentId ?? null;
     this.childId = null;
+    console.log('>> bef');
+    
     Shell.printBornMessage(this);
-
-    Shell.initREPL(this);
+    // Shell.initREPL(this);
   }
 
   spawnChild(): Shell {
