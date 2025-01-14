@@ -2,6 +2,7 @@
 import { formatDateTime } from "../util";
 import { Shell } from "./shell";
 
+
 /**
  * Main Terminal Process class
  */
@@ -14,7 +15,7 @@ export class Process {
   showBootMessage() {
     console.clear();
     console.log('Terminal started');
-    console.log(`Time: ${formatDateTime(this.startTime)}`);
+    console.log(`Time: ${formatDateTime(this.startTime)}\n`);
   }
 
   constructor() {
@@ -22,7 +23,6 @@ export class Process {
     // this.eventEmitter = new events.EventEmitter();
     
     this.showBootMessage();
-    
-    this.rootShell = new Shell();
+    this.rootShell = Shell.spawnNew();
   }
 }

@@ -4,24 +4,32 @@ import readline from "readline-sync";
 
 export type ShellID = number;
 
+/**
+ * Represents all the public attributes of a Shell instance
+ */
 export interface ShellAttributes {
-  id:             ShellID;
-  startTime:      Date;
-  parentId:       ShellID|null;
-  childId:        ShellID|null;
+  id              : ShellID;
+  startTime       : Date;
+  parentId        : ShellID|null;
+  childId         : ShellID|null;
 }
 
 /**
  * Main command interpreter. Can have a single parent and a single child.
  */
 export class Shell {
-  protected static DEFAULT_PROMPT_STRING = '>> ';
+  protected static DEFAULT_PROMPT_STRING            = '>> ';
+  private static instanceMap: Map<ShellID, Shell>   = new Map();
 
-  private id:             ShellID;
-  private startTime:      Date;
-  private promptString:   string = Shell.DEFAULT_PROMPT_STRING;
-  private parentId:       ShellID|null;
-  private childId:        ShellID|null;
+  private id              : ShellID;
+  private startTime       : Date;
+  private promptString    : string = Shell.DEFAULT_PROMPT_STRING;
+  private parentId        : ShellID|null;
+  private childId         : ShellID|null;
+
+  private static loadApps(onlyCore?: boolean) {
+    // TODO: To be implemented
+  }
 
   protected static generateShellID(): ShellID {
     const _id = Date.now();
@@ -37,25 +45,36 @@ export class Shell {
     }
   }
 
-  protected static printBornMessage(shell: Shell) {
-    console.log('*****');
-    console.log(`Shell (${shell.id}) started on ${formatDateTime(shell.startTime)}${shell.parentId ? '' : '\nThis is the top-most shell'}`);
-    console.log('*****');
+  protected static printBirthMessage(shell: Shell) {
+    let message: string;
+
+    message = '\n*****';
+    message += `\nShell (${shell.id}) started on ${formatDateTime(shell.startTime)}`;
+    if(shell.parentId) {
+      message += '\nThis is the top-most shell';
+    }
+    message += '\n*****';
+
+    console.log(message);
   }
 
-  protected static printKillMessage(shell: Shell) {
-    console.log('\n*****');
-    console.log(`Shell (${shell.id}) exiting...`);
+  protected static printDeathMessage(shell: Shell) {
+    let message: string;
+
+    message = '\n*****';
+    message += `\nShell (${shell.id}) exiting...`;
     if(shell.parentId) {
-      console.log(`Returning to parent shell ${shell.id}`);
+      message += `\nReturning to parent shell (${shell.id})`;
     } else {
-      console.log('This was the top-most shell');
+      message += '\nThis was the top-most shell';
     }
-    console.log('*****');
+    message += '\n*****';
+
+    console.log(message);
   }
     
   protected static initREPL(shell: Shell) {
-    let command: string       = '';
+    let command: string;
     let shouldExit: boolean   = false;
 
     do {
@@ -63,38 +82,46 @@ export class Shell {
       switch(command) {
         case 'exit': shouldExit = true; break;
         case 'hi': console.log('hi'); break;
+        
         default:
           // if(ShellGlobal.env.DEBUG_ENABLED)  {
             console.assert(true, '[***DEFAULT CASE OF SHELL REPL***]');
           // }
       }
     } while(!shouldExit);
-    shell.killChild();
+    shell.die();
   }
 
-  constructor(parentId?: ShellID) {
+  private static registerInstance(shell: Shell) {
+    Shell.instanceMap.set(shell.id, shell);
+  }
+
+  static spawnNew() {
+    return new Shell();
+  }
+
+  private constructor(parentId?: ShellID) {
     this.id = Shell.generateShellID();
     this.startTime = new Date();
     this.parentId = parentId ?? null;
     this.childId = null;
-    // console.log('>> bef');
     
-    Shell.printBornMessage(this);
+    Shell.registerInstance(this);
+    Shell.printBirthMessage(this);
     Shell.initREPL(this);
   }
 
   spawnChild(): Shell {
     const child = new Shell(this.id);
     this.childId = child.id;
-    
     return child;
   }
 
-  killChild() {
-    const _id = this.childId;
-    this.childId = null;
-    Shell.printKillMessage(this);
-    
-    return this.childId;
+  static findInstance(id: ShellID): Shell|undefined {
+    return Shell.instanceMap.get(id);
+  }
+
+  private die() {
+    Shell.printDeathMessage(this);
   }
 }
