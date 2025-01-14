@@ -13,9 +13,13 @@ export class Process {
   // private environment: Environment;
 
   showBootMessage() {
+    let message: string; 
+    
+    message = '\nTerminal started';
+    message = `\nTime: ${formatDateTime(this.startTime)}\n`;
+
     console.clear();
-    console.log('Terminal started');
-    console.log(`Time: ${formatDateTime(this.startTime)}\n`);
+    console.log(message);
   }
 
   constructor() {

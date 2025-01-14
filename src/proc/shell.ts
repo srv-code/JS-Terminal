@@ -32,8 +32,7 @@ export class Shell {
   }
 
   protected static generateShellID(): ShellID {
-    const _id = Date.now();
-    return _id;
+    return Date.now();
   }
 
   protected getAttributes(): ShellAttributes {
