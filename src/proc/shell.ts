@@ -1,6 +1,6 @@
 import { formatDateTime } from "../util/date";
 import readline from "readline-sync";
-
+import yargsParser from 'yargs-parser';
 
 export type ShellID = number;
 
@@ -73,18 +73,47 @@ export class Shell {
   }
     
   protected static initREPL(shell: Shell) {
-    let command: string;
-    let shouldExit: boolean   = false;
+    let commandLine:  string;
+    let shouldExit:   boolean   = false;
 
     do {
-      command = readline.question(`\n${shell.promptString}`)
+      commandLine = readline.question(`\n${shell.promptString}`);
+      const commandArgs = yargsParser(commandLine);
+      const command = commandArgs['_'][0];
+      console.log('>> ', {commandArgs});
+
       switch(command) {
         case 'exit': shouldExit = true; break;
         case 'hi': console.log('hi'); break;
+        case 't.glob': {
+          console.log('>> global', {global});
+          global.hello = function(arg) { console.log('this is from global::hello', arg); };
+          global.hello(1);
+          // hello(2);
+        }
+        break;
+
+        case 't.cmd': {
+          console.log('yargs | start');
+          try {
+            const parsed = yargsParser("hello two --version 2 -n 34 -fd --file='abc.txt' zoo")
+            console.log('yargs | result', parsed);
+          } catch (error) {
+            console.log('[catch]', error);
+          } finally {
+            console.log('[finally]');
+          }
+          console.log('yargs | end');
+        }
+        break;
         
         default:
           // if(ShellGlobal.env.DEBUG_ENABLED)  {
             console.assert(true, '[***DEFAULT CASE OF SHELL REPL***]');
+            console.log('[***DEFAULT CASE OF SHELL REPL***]', {
+              command: commandLine,
+              splits: commandLine.split(/\s/)
+            });
           // }
       }
     } while(!shouldExit);
