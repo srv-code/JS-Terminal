@@ -91,7 +91,7 @@ export class Shell {
       default: {
         // console.log('default case 1', {cmd, args});
         try {
-          const cmdFn = await import(`../apps/commands/core/${cmd}`)
+          const cmdFn = await import(`../apps/commands/core/${cmd}`);
           // console.log('import | success: ', cmdFn);
           cmdFn.default(parsed);
           // console.log('import | cmd success: ', cmdFn);
@@ -106,9 +106,8 @@ export class Shell {
           if(err.code === 'MODULE_NOT_FOUND') {
             console.error(`Invalid command '${cmd}'`);
             return REPLReturnValue.COMMAND_NOT_FOUND;
-          } else {
-            console.error('Unhandled Error:', err);
           }
+          console.error('Unhandled Error:', err);
           return REPLReturnValue.UNKNOWN_ERROR;
         }
       }
