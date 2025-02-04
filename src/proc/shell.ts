@@ -14,6 +14,13 @@ export interface ShellAttributes {
   childId         : ShellID|null;
 }
 
+enum REPLReturnValue {
+  SUCCESS,
+  EXIT, 
+  COMMAND_NOT_FOUND,
+  UNKNOWN_ERROR,
+}
+
 /**
  * Main command interpreter. Can have a single parent and a single child.
  */
@@ -71,51 +78,54 @@ export class Shell {
 
     console.log(message);
   }
+
+  private static async processCommand(cmd, parsed): Promise<REPLReturnValue> {
+    switch(cmd) {
+      case 'exit': return REPLReturnValue.EXIT;
+
+      case 'hi': {
+        console.log('hi');
+        return REPLReturnValue.SUCCESS;
+      }
+
+      default: {
+        // console.log('default case 1', {cmd, args});
+        try {
+          const cmdFn = await import(`../apps/commands/core/${cmd}`)
+          // console.log('import | success: ', cmdFn);
+          cmdFn.default(parsed);
+          // console.log('import | cmd success: ', cmdFn);
+          return REPLReturnValue.SUCCESS;
+        } catch (err) {
+          // console.error('import | err: ', {
+          //   err,
+          //   message: err.message, 
+          //   keys: Object.keys(err), 
+          //   code: err.code
+          // });
+          if(err.code === 'MODULE_NOT_FOUND') {
+            console.error(`Invalid command '${cmd}'`);
+            return REPLReturnValue.COMMAND_NOT_FOUND;
+          } else {
+            console.error('Unhandled Error:', err);
+          }
+          return REPLReturnValue.UNKNOWN_ERROR;
+        }
+      }
+    }
+  } 
     
-  protected static initREPL(shell: Shell) {
-    let commandLine:  string;
+  protected static async initREPL(shell: Shell) {
+    let cmdln:  string;
     let shouldExit:   boolean   = false;
 
     do {
-      commandLine = readline.question(`\n${shell.promptString}`);
-      const commandArgs = yargsParser(commandLine);
-      const command = commandArgs['_'][0];
-      console.log('>> ', {commandArgs});
+      cmdln = readline.question(`\n${shell.promptString}`);
+      const parsed = yargsParser(cmdln);
+      const cmd = parsed['_'][0];
 
-      switch(command) {
-        case 'exit': shouldExit = true; break;
-        case 'hi': console.log('hi'); break;
-        case 't.glob': {
-          console.log('>> global', {global});
-          global.hello = function(arg) { console.log('this is from global::hello', arg); };
-          global.hello(1);
-          // hello(2);
-        }
-        break;
-
-        case 't.cmd': {
-          console.log('yargs | start');
-          try {
-            const parsed = yargsParser("hello two --version 2 -n 34 -fd --file='abc.txt' zoo")
-            console.log('yargs | result', parsed);
-          } catch (error) {
-            console.log('[catch]', error);
-          } finally {
-            console.log('[finally]');
-          }
-          console.log('yargs | end');
-        }
-        break;
-        
-        default:
-          // if(ShellGlobal.env.DEBUG_ENABLED)  {
-            console.assert(true, '[***DEFAULT CASE OF SHELL REPL***]');
-            console.log('[***DEFAULT CASE OF SHELL REPL***]', {
-              command: commandLine,
-              splits: commandLine.split(/\s/)
-            });
-          // }
-      }
+      const returned = await Shell.processCommand(cmd, parsed);
+      shouldExit = returned === REPLReturnValue.EXIT;
     } while(!shouldExit);
     shell.die();
   }
